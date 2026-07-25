@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e94b82">
+  <meta name="description" content="ブラウザだけで音声ファイルの音量を調節できるWebアプリです。ファイルはサーバーへ送信されません。">
+  <title>おくさん音量調節 Web版</title>
+  <link rel="icon" href="assets/okusan-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="assets/okusan-icon.png" class="brand-icon" alt="おくさんアイコン">
+      <div>
+        <div class="title-line">
+          <h1>おくさん音量調節</h1>
+          <span class="web-badge">Web版</span>
+        </div>
+        <p>ブラウザだけで完結。音声ファイルの音量をかんたん調整！</p>
+      </div>
+    </div>
+    <button id="helpButton" class="ghost-button" type="button">？ 使い方</button>
+  </header>
+
+  <main class="app-shell">
+    <section id="dropZone" class="drop-zone" tabindex="0" aria-label="音声ファイルを選択">
+      <div class="drop-copy">
+        <div class="upload-icon">↥</div>
+        <h2>音声ファイルをドラッグ＆ドロップ</h2>
+        <p>または</p>
+        <button id="selectButton" class="primary-button" type="button">ファイルを選択</button>
+        <input id="fileInput" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.opus" multiple hidden>
+        <p class="support-note">ブラウザが再生できる音声形式に対応／出力はWAV</p>
+      </div>
+      <img src="assets/okusan-icon.png" class="drop-mascot" alt="">
+    </section>
+
+    <section id="filePanel" class="file-panel hidden" aria-live="polite">
+      <div class="section-heading">
+        <h2>選択したファイル</h2>
+        <button id="clearButton" class="text-button" type="button">すべて外す</button>
+      </div>
+      <div id="fileList" class="file-list"></div>
+    </section>
+
+    <div class="settings-grid">
+      <section class="card volume-card">
+        <div class="card-title"><span>🔊</span><h2>音量調整</h2></div>
+        <div class="volume-display"><strong id="volumeDisplay">150</strong><span>%</span></div>
+        <input id="volumeSlider" class="volume-slider" type="range" min="1" max="400" value="150" step="1">
+        <div class="range-labels"><span>1%</span><span>400%</span></div>
+        <div class="preset-row">
+          <button data-volume="70">70%</button>
+          <button data-volume="100">100%</button>
+          <button data-volume="120">120%</button>
+          <button data-volume="130">130%</button>
+          <button data-volume="150" class="active">150%</button>
+          <button data-volume="200">200%</button>
+        </div>
+        <label class="number-row">数値を入力：
+          <input id="volumeNumber" type="number" min="1" max="1000" value="150">
+          <span>%</span>
+        </label>
+      </section>
+
+      <div class="right-column">
+        <section class="card options-card">
+          <div class="card-title"><span>🛡️</span><h2>オプション</h2></div>
+          <label class="check-row">
+            <input id="limiterCheck" type="checkbox" checked>
+            <span><strong>音割れ防止</strong><small>コンプレッサーでピークを抑えます（おすすめ）</small></span>
+          </label>
+          <label class="check-row">
+            <input id="normalizeCheck" type="checkbox">
+            <span><strong>ピーク正規化</strong><small>処理後の最大音量を約 -1 dB にそろえます</small></span>
+          </label>
+        </section>
+
+        <section class="card format-card">
+          <div class="card-title"><span>🎵</span><h2>出力形式</h2></div>
+          <div class="format-value">WAV（16bit PCM）</div>
+          <p>追加ソフトや外部サーバーを使わず、ブラウザ内だけで確実に保存できる形式です。</p>
+        </section>
+      </div>
+    </div>
+
+    <section class="card action-card">
+      <div>
+        <div class="card-title"><span>〽</span><h2>処理とダウンロード</h2></div>
+        <p id="statusText">音声ファイルを選択してください</p>
+        <div id="progressWrap" class="progress-wrap hidden"><div id="progressBar" class="progress-bar"></div></div>
+      </div>
+      <button id="convertButton" class="convert-button" type="button" disabled>変換してダウンロード</button>
+    </section>
+
+    <section class="privacy-note">
+      <span>💡</span>
+      <div><strong>プライバシーについて</strong><p>処理はすべてお使いのブラウザ内で実行します。音声ファイルがサーバーへ送信されることはありません。</p></div>
+    </section>
+  </main>
+
+  <footer>
+    <img src="assets/okusan-icon.png" alt="">
+    <span>おくさん音量調節 Web版</span><span>💕</span><span>ブラウザだけで音量を自由自在に！</span>
+  </footer>
+
+  <dialog id="helpDialog">
+    <button id="closeHelp" class="dialog-close" type="button" aria-label="閉じる">×</button>
+    <h2>使い方</h2>
+    <ol>
+      <li>音声ファイルをドラッグ＆ドロップするか、「ファイルを選択」を押します。</li>
+      <li>音量をパーセントで指定します。150%なら1.5倍です。</li>
+      <li>必要に応じて音割れ防止やピーク正規化を選びます。</li>
+      <li>「変換してダウンロード」を押すと、WAVとして保存されます。</li>
+    </ol>
+    <p>長い音声や大きなファイルは、端末のメモリを多く使うことがあります。</p>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
